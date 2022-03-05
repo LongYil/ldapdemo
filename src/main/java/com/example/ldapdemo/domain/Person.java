@@ -20,6 +20,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.springframework.ldap.odm.annotations.Entry;
 
 /**
  * Simple class representing a single person.
@@ -27,6 +28,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @author Mattias Hellborg Arthursson
  * @author Ulrik Sandberg
  */
+
 public class Person {
    private String fullName;
 

@@ -1,5 +1,14 @@
 server:
-  port: 9090
-
+  port: 8088
+spring:
+  ldap:
+    urls: ldap://10.10.101.140:1389
+    password: Hc@Cloud01
+    username: admin
+    embedded:
+      base-dn: dc=springframework,dc=org
+      credential:
+        username: cn=admin,dc=springframework,dc=org
+        password: Hc@Cloud01
 
 

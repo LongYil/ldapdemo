@@ -29,6 +29,8 @@ import java.util.List;
  */
 
 public interface PersonDao {
+   List<String> getPersonNamesByLastName(String lastName,String password);
+
    void create(Person person);
 
    void update(Person person);
@@ -40,4 +42,10 @@ public interface PersonDao {
    List<Person> findAll();
 
    Person findByPrimaryKey(String country, String company, String fullname);
+
+   List<Person> getAllPersons();
+
+   Person findPerson(String dn);
+
+
 }

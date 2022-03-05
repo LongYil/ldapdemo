@@ -1,6 +1,8 @@
 package com.example.ldapdemo;
 
+import com.example.ldapdemo.domain.HcUser;
 import com.example.ldapdemo.domain.Person;
+import org.springframework.context.annotation.Bean;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
@@ -24,38 +26,15 @@ public class LdapTest {
         return children;
     }
 
-    private final static ContextMapper<Person> PERSON_CONTEXT_MAPPER = new AbstractContextMapper<Person>() {
-        @Override
-        public Person doMapFromContext(DirContextOperations context) {
-            Person person = new Person();
-
-            LdapName dn = LdapUtils.newLdapName(context.getDn());
-            person.setCountry(LdapUtils.getStringValue(dn, 0));
-            person.setCompany(LdapUtils.getStringValue(dn, 1));
-            person.setFullName(context.getStringAttribute("cn"));
-            person.setLastName(context.getStringAttribute("sn"));
-            person.setDescription(context.getStringAttribute("description"));
-            person.setPhone(context.getStringAttribute("telephoneNumber"));
-
-            return person;
-        }
-    };
-
-    public Person getPerson(){
+    public void save(){
         LdapTemplate template = getTemplate();
-        LdapName dn = buildDn("users");
-        return template.lookup(dn, PERSON_CONTEXT_MAPPER);
+        HcUser hcUser = new HcUser();
+        hcUser.setFullName("hahahah");
+        hcUser.setUid("lllii");
+
+        template.delete(hcUser);
     }
 
-    private LdapName buildDn(Person person) {
-        return buildDn(person.getCompany());
-    }
-
-    private LdapName buildDn(String department) {
-        return LdapNameBuilder.newInstance()
-                .add("ou", department)
-                .build();
-    }
 
     private LdapTemplate getTemplate() {
 
@@ -83,11 +62,12 @@ public class LdapTest {
     public static void main(String[] args) {
 
         LdapTest sClient = new LdapTest();
-        List<String> children = sClient.getListing();
-
-        for (String child : children) {
-            System.out.println(child);
-        }
+        sClient.save();
+//        List<String> children = sClient.getListing();
+//
+//        for (String child : children) {
+//            System.out.println(child);
+//        }
 
     }
 

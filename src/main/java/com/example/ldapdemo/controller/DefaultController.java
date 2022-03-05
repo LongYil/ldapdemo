@@ -1,6 +1,8 @@
 package com.example.ldapdemo.controller;
 
 import com.example.ldapdemo.dao.PersonDaoImpl;
+import com.example.ldapdemo.dao.PersonRepository;
+import com.example.ldapdemo.domain.HcUser;
 import com.example.ldapdemo.domain.Person;
 import com.example.ldapdemo.utils.HtmlRowLdapTreeVisitor;
 import com.example.ldapdemo.utils.LdapTree;
@@ -8,6 +10,7 @@ import com.example.ldapdemo.utils.LdapTreeBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.DirContextOperations;
+import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.support.LdapUtils;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.naming.Name;
+import javax.naming.ldap.LdapName;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 /**
  * Default controller.
@@ -28,13 +33,49 @@ import java.net.URLEncoder;
 public class DefaultController {
 
 	@Autowired
+	private LdapTemplate ldapTemplate;
+
+	@Autowired
 	private LdapTreeBuilder ldapTreeBuilder;
 
 	@Autowired
 	private PersonDaoImpl personDao;
 
+
 	@GetMapping("/welcome.do")
-	public void welcomeHandler() {
+	public String welcomeHandler() {
+		StringBuffer sbf = new StringBuffer();
+		ldapTemplate.list("ou=cloudnative,dc=springframework,dc=org").forEach(item -> {
+			System.out.println(item);
+			sbf.append(item);
+		});
+		return sbf.toString();
+	}
+
+	@GetMapping("/login.do")
+	public String loginHandler() {
+		StringBuffer sbf = new StringBuffer();
+		System.out.println("开始查询");
+		System.out.println(">> " + personDao.getPersonNamesByLastName("li", "1234567"));
+		return sbf.toString();
+	}
+
+	@GetMapping("/listall")
+	public String listAll() {
+		List<String> names = personDao.getAllPersonNames();
+		names.forEach(item -> {
+			System.out.println(item);
+		});
+
+		List<Person> allPersons = personDao.getAllPersons();
+		allPersons.forEach(item -> {
+			System.out.println(item.getFullName() + "==" + item.getLastName());
+		});
+
+		Person person = personDao.findPerson("cn=developers,ou=groups,dc=springframework,dc=org");
+		System.out.println(person.getFullName() + "==" + person.getLastName());
+
+		return "sucess";
 	}
 
 	@GetMapping("/showTree.do")
@@ -48,7 +89,6 @@ public class DefaultController {
 	@GetMapping("/addPerson.do")
 	public String addPerson() {
 		Person person = getPerson();
-
 		personDao.create(person);
 		return "redirect:/showTree.do";
 	}
@@ -64,7 +104,6 @@ public class DefaultController {
 	@RequestMapping("/removePerson.do")
 	public String removePerson() {
 		Person person = getPerson();
-
 		personDao.delete(person);
         return "redirect:/showTree.do";
 	}
